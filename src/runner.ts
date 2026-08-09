@@ -78,6 +78,25 @@ export function runAllChecks(config: RunConfig): CheckResult[] {
 }
 
 /**
+ * Final structured result for a run. Used by both the human-facing printer
+ * and the `--json` emitter. Stable shape — agents consume this directly.
+ */
+export interface RunReport {
+  /** Wall-clock ISO timestamp at run start. */
+  startedAt: string;
+  /** "0.1.0" — stapes-precommit version. */
+  tool: string;
+  /** Exit code (0 pass, 1 fail, 2 warn-in-strict). */
+  exitCode: number;
+  /** Number of checks that ran. */
+  checkCount: number;
+  failed: number;
+  warned: number;
+  /** Empty array when there are no findings. */
+  findings: Finding[];
+}
+
+/**
  * Print summary, print details, return exit code.
  */
 export function reportAndExit(results: CheckResult[], strict: boolean): number {
@@ -86,6 +105,38 @@ export function reportAndExit(results: CheckResult[], strict: boolean): number {
   printSummary(results);
   printDetails(results);
   return finalExit(counts, strict);
+}
+
+/**
+ * Build a structured RunReport. Agents consume this directly via `--json`.
+ * Pure function — no I/O — so the caller decides where the bytes go.
+ */
+export function buildReport(results: CheckResult[], strict: boolean): RunReport {
+  const counts = tallyResults(results);
+  const findings = results.flatMap((r) => r.findings);
+  return {
+    startedAt: new Date().toISOString(),
+    tool: "stapes-precommit@0.1.0",
+    exitCode: exitCodeFromCounts(counts, strict),
+    checkCount: results.length,
+    failed: counts.failed,
+    warned: counts.warned,
+    findings,
+  };
+}
+
+/**
+ * Emit the structured report as JSON on stdout. Stable key order; agents
+ * rely on `exitCode` + `findings[].file` + `findings[].line` + `findings[].message`.
+ */
+export function emitJson(report: RunReport): string {
+  return JSON.stringify(report, null, 2) + "\n";
+}
+
+function exitCodeFromCounts(counts: { failed: number; warned: number }, strict: boolean): number {
+  if (counts.failed > 0) return 1;
+  if (counts.warned > 0 && strict) return 1;
+  return 0;
 }
 
 type ResultKind = "fail" | "warn" | "pass";

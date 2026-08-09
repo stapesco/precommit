@@ -15,7 +15,7 @@
 import { Command } from "commander";
 import { writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { defaultRunConfig, runAllChecks, reportAndExit } from "./runner.js";
+import { defaultRunConfig, runAllChecks, reportAndExit, buildReport, emitJson } from "./runner.js";
 import { installHook, uninstallHook } from "./hook-install.js";
 import { getRepoRoot } from "./util.js";
 
@@ -35,8 +35,9 @@ program
   .option("--check <name>", "run a single check (secrets|large-files|console|todo|filesize)")
   .option("--list", "list available checks")
   .option("--strict", "treat warnings as errors")
-  .option("--no-color", "disable ANSI color output")
-  .option("--init-config <path>", "write a default config file to <path>");
+  .option("--init-config <path>", "write a default config file to <path>")
+  .option("--json", "emit a structured JSON report on stdout (stable shape; agent-friendly)")
+  .option("--no-color", "disable ANSI color output");
 
 program.parse(process.argv);
 const opts = program.opts();
@@ -102,13 +103,31 @@ async function main(): Promise<number> {
       config.checks[k as keyof typeof config.checks].enabled = k === name;
     }
     const results = runAllChecks(config);
-    return reportAndExit(results, config.strict);
+    return emit(results, config.strict, opts.json);
   }
 
   // --run (default)
   const config = { ...defaultRunConfig, strict: !!opts.strict };
   const results = runAllChecks(config);
-  return reportAndExit(results, config.strict);
+  return emit(results, config.strict, opts.json);
+}
+
+/**
+ * Emit results either as human-readable text (the default) or as a
+ * structured JSON report (when --json is set). Same exit-code semantics
+ * in both modes: 0 = clean, 1 = blocked, 2 = warn-in-strict.
+ */
+function emit(results: ReturnType<typeof runAllChecks>, strict: boolean, json: boolean | undefined): number {
+  if (results.length === 0) {
+    // Nothing to report either way — stay quiet so scripts can chain cleanly.
+    return 0;
+  }
+  if (json) {
+    const report = buildReport(results, strict);
+    process.stdout.write(emitJson(report));
+    return report.exitCode;
+  }
+  return reportAndExit(results, strict);
 }
 
 main().then((code) => process.exit(code)).catch((err) => {

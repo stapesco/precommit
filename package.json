@@ -1,7 +1,7 @@
 {
   "name": "stapes-precommit",
   "version": "0.1.0",
-  "description": "Zero-config pre-commit hook with 5 sanity checks: secrets, large files, console.log, TODO markers, sensitive paths. Install in any repo with `npx stapes-precommit --init`.",
+  "description": "Zero-config pre-commit hook with five sanity checks: secrets, large files, console.log, TODO markers, sensitive paths. One command to install, zero config to maintain. Zero telemetry. Stable --json output for AI agents and CI.",
   "license": "MIT",
   "author": "stapesco <github@stapes.co.za>",
   "homepage": "https://github.com/stapesco/precommit",
@@ -10,13 +10,21 @@
     "url": "git+https://github.com/stapesco/precommit.git"
   },
   "bugs": {
-    "url": "https://github.com/stapesco/precommit/issues"
+    "url": "https://github.com/stapesco/precommit"
   },
   "keywords": [
     "pre-commit",
     "git",
+    "git-hooks",
     "secrets",
     "lint",
+    "static-analysis",
+    "aws-keys",
+    "console-log",
+    "ai-agent",
+    "cli",
+    "npx",
+    "zero-config",
     "stapes"
   ],
   "bin": {
@@ -25,6 +33,7 @@
   "files": [
     "dist",
     "README.md",
+    "AGENTS.md",
     "LICENSE"
   ],
   "type": "module",
