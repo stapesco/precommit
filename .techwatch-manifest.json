@@ -49,6 +49,7 @@
     ]
   },
   "checked_at": "2026-08-09",
+  "generated_at": "2026-08-09T17:55:00Z",
   "sources": [
     "https://docs.npmjs.com/cli/v10/configuring-npm/package-json",
     "https://vitest.dev/guide/",
