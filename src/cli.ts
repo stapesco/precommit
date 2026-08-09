@@ -17,7 +17,7 @@ import { writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { defaultRunConfig, runAllChecks, reportAndExit, buildReport, emitJson } from "./runner.js";
 import { installHook, uninstallHook } from "./hook-install.js";
-import { getRepoRoot } from "./util.js";
+import { c, getRepoRoot } from "./util.js";
 import { assertNodeVersion } from "./node-check.js";
 
 const VERSION = "0.1.1";
@@ -124,7 +124,11 @@ async function main(): Promise<number> {
  */
 function emit(results: ReturnType<typeof runAllChecks>, strict: boolean, json: boolean | undefined): number {
   if (results.length === 0) {
-    // Nothing to report either way — stay quiet so scripts can chain cleanly.
+    // Empty-result case (no staged files). The "nothing to check" notice
+    // is human-only — --json must stay stderr-quiet per the README contract.
+    if (!json) {
+      process.stderr.write(`${c.gray("no staged files — nothing to check\n")}`);
+    }
     return 0;
   }
   if (json) {

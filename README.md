@@ -60,7 +60,7 @@ npx stapes-precommit --json | jq '.exitCode, .findings[].message'
 ```json
 {
   "startedAt": "2026-08-09T10:49:45.195Z",
-  "tool": "stapes-precommit@0.1.0",
+  "tool": "stapes-precommit@0.1.1",
   "exitCode": 1,
   "checkCount": 5,
   "failed": 1,
@@ -88,7 +88,7 @@ The five checks:
 |---|---|---|---|
 | `secrets` | AWS keys, GitHub PATs, OpenAI / Anthropic / Stripe / Google keys, JWTs, PEM blocks, generic Bearer tokens | **block** | matches at 80%+ confidence |
 | `large-files` | files above the size cap | warn > 1 MB, **block** > 10 MB | `--init-config` to override |
-| `console` | `console.log` / `console.warn` in `.ts` / `.js` / `.tsx` / `.jsx` | **block** (skipped in `*.test.*` and `__tests__/`) | — |
+| `console` | `console.log` / `console.warn` (and `console?.log` / `console?.warn`) in `.ts` / `.js` / `.tsx` / `.jsx` / `.mjs` / `.cjs` | **block** (skipped in `*.test.*`, `*.spec.*`, `__tests__/`, `test/` or `tests/` directories, and the `scripts/` directory) | — |
 | `todo` | `TODO` / `FIXME` / `XXX` without a ticket reference (`#1234`) | warn (block with `--strict`) | — |
 | `sensitive-files` | sensitive filenames: `.env`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `service-account*.json`, `.npmrc`, `.netrc`, `*.sqlite` | **block** | filename-based |
 
@@ -119,8 +119,10 @@ This tool is designed for AI agent runtimes and CI scripts:
 - **Zero config.** No files to write. No env vars to set.
 - **`--json`** emits parseable output with a stable schema (`startedAt`,
   `tool`, `exitCode`, `checkCount`, `failed`, `warned`, `findings[]`).
-- **Exit codes are stable.** `0` clean, `1` blocked, `2` not-in-git-repo
-  or `--init` failure.
+- **Exit codes are stable.** `0` clean, `1` blocked, `2` Node.js too old
+  (engines `>=18` not met — see `src/node-check.ts`). All other failure
+  modes (not in a git repo, `--init` failure, unknown `--check` name,
+  unhandled exception) exit `1`.
 - **Idempotent install.** `--init` is safe to re-run. `--uninstall`
   removes cleanly.
 - **Runs offline.** No API keys. No service to log into.

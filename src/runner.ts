@@ -84,7 +84,9 @@ export function runAllChecks(config: RunConfig, opts: RunOptions = {}): CheckRes
 
   const files = getStagedFiles(repoRoot);
   if (files.length === 0) {
-    process.stderr.write(`${c.gray("no staged files — nothing to check\n")}`);
+    // Empty-result case: leave the message in `c.gray` for cli.ts emit()
+    // to render in human mode only. The runner stays I/O-light here so
+    // --json callers never see stray stderr.
     return [];
   }
 
