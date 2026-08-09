@@ -1,0 +1,48 @@
+{
+  "name": "stapes-precommit",
+  "version": "0.1.0",
+  "description": "Zero-config pre-commit hook with 5 sanity checks: secrets, large files, console.log, TODO markers, sensitive paths. Install in any repo with `npx stapes-precommit --init`.",
+  "license": "MIT",
+  "author": "stapesco <github@stapes.co.za>",
+  "homepage": "https://github.com/stapesco/precommit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stapesco/precommit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stapesco/precommit/issues"
+  },
+  "keywords": [
+    "pre-commit",
+    "git",
+    "secrets",
+    "lint",
+    "stapes"
+  ],
+  "bin": {
+    "stapes-precommit": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build && npm test",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.1.0"
+  }
+}
