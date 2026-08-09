@@ -1,36 +1,49 @@
 # stapes-precommit
 
-Zero-config pre-commit hook with 5 sanity checks. Catch the common screw-ups before they hit the remote.
+> A pre-commit hook only protects you if **every** commit goes through it. Most setups break within a week. `stapes-precommit` is the answer: one command, the same five checks on every commit. No Python. No Docker. No config to maintain.
+
+## Why
+
+Most pre-commit setups break within a week. Someone forgets the hook on a clone. A new joiner skips the install on day one and ships a leaked API key by day three.
+
+This tool is intentionally minimal. The binary is one file. The checks are five. The install is one command. Nothing to maintain because nothing to configure.
+
+The checks that ship in v0.1.0:
+
+| Check | What | Default |
+|-------|------|---------|
+| `secrets` | AWS, GitHub PATs, OpenAI/Anthropic, Stripe, JWT, PEM, generic passwords | block |
+| `large-files` | Files over 10 MB | block / warn over 1 MB |
+| `console` | `console.log` and `console.warn` in `.ts` / `.js` code | block |
+| `todo` | `TODO` / `FIXME` / `XXX` without a ticket reference | warn |
+| `filesize` | `.env`, `*.pem`, `id_rsa`, `credentials.json` | block |
+
+## How
 
 ```bash
 npx stapes-precommit --init
 ```
 
-Then `git commit` runs the checks automatically.
+Then `git commit` runs the checks automatically. Every contributor, every clone, every commit.
 
-## What it catches
+```text
+✓ secrets      0 hits
+✓ large-files  0 hits
+✗ console      1 hit(s)
+⚠ todo         0 hits
+✓ filesize     0 hits
 
-| Check         | What                                                                         | Default   |
-| ------------- | ---------------------------------------------------------------------------- | --------- |
-| `secrets`     | AWS keys, GitHub PATs, OpenAI/Anthropic, Stripe, JWT, PEM, generic passwords | **block** |
-| `large-files` | Files > 10 MB (block); > 1 MB (warn)                                         | **block** |
-| `console`     | `console.log` / `console.warn` in `.ts`/`.js` code (skip tests, scripts/)    | **block** |
-| `todo`        | `TODO` / `FIXME` / `XXX` without a ticket reference                          | **warn**  |
-| `filesize`    | Sensitive filenames (`.env`, `*.pem`, `id_rsa`, `credentials.json`, etc.)    | **block** |
+console:
+  src/index.ts:14
+    console.log/warn in production code
+    console.log("debug", payload);
 
-No config required. Run, see, fix.
-
-## Install
-
-```bash
-# One-time, in any repo
-npx stapes-precommit --init
-
-# Optional: write a default config to opt out / customize
-npx stapes-precommit --init-config .stapes-precommit.json
+1 check(s) failed. Commit blocked.
 ```
 
-## CLI
+The hook installs to `.git/hooks/pre-commit` inside a marker block. It will not fight hooks from other tools.
+
+## What
 
 ```bash
 stapes-precommit [options]
@@ -47,37 +60,20 @@ stapes-precommit [options]
   --help
 ```
 
-## Example output
+## Compared to
 
-```
-✓ secrets      0 hits
-✓ large-files  0 hits
-✗ console      1 hit(s)
-⚠ todo         0 hits
-✓ filesize     0 hits
+| Tool | The gap |
+|------|---------|
+| `gitleaks` | Needs config and Docker for the full version |
+| `pre-commit.com` | Needs Python on every dev machine |
+| `husky` + `lint-staged` | Lockfile and Node version dance, breaks on Windows |
+| `lint-staged` alone | Needs a linter to be useful |
 
-console:
-  src/index.ts:14
-    console.log/warn in production code
-    console.log("debug", payload);
-
-1 check(s) failed. Commit blocked.
-```
-
-## Why not husky / pre-commit / lint-staged?
-
-| Tool                    | Why we built stapes-precommit instead                 |
-| ----------------------- | ----------------------------------------------------- |
-| `gitleaks`              | Excellent but needs config + Docker for full version  |
-| `pre-commit.com`        | Needs Python; every dev needs it installed            |
-| `husky` + `lint-staged` | Lockfile + node-version dependency, breaks on Windows |
-| `lint-staged` alone     | Useful but needs the linter to be useful              |
-
-`stapes-precommit` is one command, zero per-dev requirements, sane defaults, fast enough to run on every commit.
+`stapes-precommit` is one command and zero per-dev requirements. Sane defaults. Fast enough to run on every commit.
 
 ## Source
 
-Visible at https://github.com/stapesco/precommit. **This is brand project.** Read the code. Fork it. Don't expect PRs to be merged.
+Visible at https://github.com/stapesco/precommit. One-person brand project. Read the code. Fork it. PRs are not accepted.
 
 ## License
 
