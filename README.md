@@ -73,7 +73,7 @@ stapes-precommit [options]
 
 ## Source
 
-Visible at https://github.com/stapesco/precommit. One-person brand project. Read the code. Fork it. PRs are not accepted.
+Visible at https://github.com/stapesco/precommit. Built by stapes. Read the code. Fork it. PRs are not accepted.
 
 ## License
 
