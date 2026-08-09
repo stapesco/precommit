@@ -49,7 +49,7 @@ Idempotent. Running `--init` twice is a no-op. `--uninstall` removes cleanly.
 | `large-files` | files staged above warn (1 MB) and block (10 MB) thresholds | warn → block |
 | `console` | `console.log/warn/debug/trace` in non-test source files | warn |
 | `todo` | `TODO` / `FIXME` markers without an owning issue reference | warn |
-| `filesize` | individual staged files above per-file soft cap | warn |
+| `sensitive-files` | filenames matching sensitive patterns: `.env`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `service-account*.json`, `.npmrc`, `.netrc`, `*.sqlite` | block |
 
 ## Output shapes
 

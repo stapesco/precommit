@@ -21,6 +21,12 @@ export const defaultConsoleConfig: ConsoleConfig = {
 
 const TARGET_EXTS = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
 
+/** Path-segment matcher: returns true if `seg` is a directory segment of `path`. */
+function hasPathSegment(path: string, seg: string): boolean {
+  const parts = path.split("/");
+  return parts.includes(seg);
+}
+
 export function checkConsole(files: StagedFile[], config: ConsoleConfig): CheckResult {
   const findings: Finding[] = [];
 
@@ -30,8 +36,9 @@ export function checkConsole(files: StagedFile[], config: ConsoleConfig): CheckR
     // Skip tests if config allows.
     if (config.allow_in_tests && isTestFile(file.path)) continue;
 
-    // Skip scripts/ (intentional CLI / scripting output).
-    if (file.path.startsWith("scripts/") || file.path.includes("/scripts/")) continue;
+    // Skip scripts/ as a directory segment (not a substring like
+    // "my-scripts" or "scripts-utils" — that was a false-negative bug).
+    if (hasPathSegment(file.path, "scripts")) continue;
 
     // Only scan JS/TS extensions.
     if (!TARGET_EXTS.some((ext) => file.path.endsWith(ext))) continue;

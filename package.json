@@ -1,6 +1,6 @@
 {
   "name": "stapes-precommit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-config pre-commit hook with five sanity checks: secrets, large files, console.log, TODO markers, sensitive paths. One command to install, zero config to maintain. Zero telemetry. Stable --json output for AI agents and CI.",
   "license": "MIT",
   "author": "stapesco <github@stapes.co.za>",

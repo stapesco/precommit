@@ -140,5 +140,4 @@ export const SECRET_SCAN_EXCLUDE: RegExp[] = [
   /tests\//,
   /fixtures\//,
   /__snapshots__\//,
-  /\/test\/.*\.ts$/,
 ];

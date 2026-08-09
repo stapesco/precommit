@@ -20,7 +20,7 @@ import { installHook, uninstallHook } from "./hook-install.js";
 import { getRepoRoot } from "./util.js";
 import { assertNodeVersion } from "./node-check.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const program = new Command();
 
@@ -33,7 +33,7 @@ program
   .option("--init", "install the pre-commit hook in current repo")
   .option("--uninstall", "remove the pre-commit hook")
   .option("--run", "run all checks against staged changes (default)")
-  .option("--check <name>", "run a single check (secrets|large-files|console|todo|filesize)")
+  .option("--check <name>", "run a single check (secrets|large-files|console|todo|sensitive-files)")
   .option("--list", "list available checks")
   .option("--strict", "treat warnings as errors")
   .option("--init-config <path>", "write a default config file to <path>")
@@ -45,6 +45,26 @@ const opts = program.opts();
 
 async function main(): Promise<number> {
   assertNodeVersion();
+
+  // --init-config must be handled BEFORE --init: --init returns early and
+  // would otherwise swallow the config-file request.
+  // --init-config
+  if (opts.initConfig) {
+    const path = resolve(opts.initConfig);
+    const config = {
+      checks: {
+        secrets: { enabled: true, extra_patterns: [] },
+        "large-files": { enabled: true, max_kb: 10240, warn_kb: 1024 },
+        console: { enabled: true, allow_in_tests: true },
+        todo: { enabled: true, strict: false },
+        "sensitive-files": { enabled: true },
+      },
+    };
+    writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf8");
+    process.stdout.write(`Wrote config to ${path}\n`);
+    return 0;
+  }
+
   // --init
   if (opts.init) {
     const repoRoot = getRepoRoot();
@@ -68,26 +88,9 @@ async function main(): Promise<number> {
   // --list
   if (opts.list) {
     process.stdout.write("Available checks:\n");
-    for (const name of ["secrets", "large-files", "console", "todo", "filesize"]) {
+    for (const name of ["secrets", "large-files", "console", "todo", "sensitive-files"]) {
       process.stdout.write(`  ${name}\n`);
     }
-    return 0;
-  }
-
-  // --init-config
-  if (opts.initConfig) {
-    const path = resolve(opts.initConfig);
-    const config = {
-      checks: {
-        secrets: { enabled: true, extra_patterns: [] },
-        "large-files": { enabled: true, max_kb: 10240, warn_kb: 1024 },
-        console: { enabled: true, allow_in_tests: true },
-        todo: { enabled: true, strict: false },
-        filesize: { enabled: true },
-      },
-    };
-    writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf8");
-    process.stdout.write(`Wrote config to ${path}\n`);
     return 0;
   }
 

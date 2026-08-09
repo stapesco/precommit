@@ -74,7 +74,12 @@ export function getStagedFiles(repoRoot: string): StagedFile[] {
     let content = "";
     if (!status.startsWith("D")) {
       try {
-        content = readFileSync(`${repoRoot}/${path}`, "utf8");
+        // `git diff --cached` returns paths relative to the repo root. The
+        // shell git runs in `repoRoot` (via cwd below), so we must construct
+        // an absolute path explicitly here — readFileSync with a relative
+        // path would resolve against the *process* cwd, not repoRoot.
+        const absPath = path.startsWith("/") ? path : `${repoRoot}/${path}`;
+        content = readFileSync(absPath, "utf8");
       } catch {
         content = "";
       }
@@ -97,35 +102,6 @@ export function getRepoRoot(): string | null {
     return out.trim();
   } catch {
     return null;
-  }
-}
-
-/**
- * Get the diff hunks for a single staged file (used to find line numbers).
- * Returns an empty array if the file is added (no diff exists yet).
- */
-export function getStagedDiffLines(repoRoot: string, filePath: string): number[] {
-  try {
-    const raw = execSync(
-      `git diff --cached --unified=0 -- "${filePath}"`,
-      { cwd: repoRoot, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }
-    );
-    const lines = raw.split("\n");
-    const result: number[] = [];
-    for (const line of lines) {
-      // Hunks look like: @@ -0,0 +1,5 @@ or @@ -10,3 +12,5 @@
-      const m = line.match(/^@@ \+\d+,(\d+)/);
-      if (m) {
-        const startLine = parseInt(line.split("+")[1].split(",")[0], 10);
-        const count = parseInt(m[1], 10);
-        for (let i = 0; i < count; i++) {
-          result.push(startLine + i);
-        }
-      }
-    }
-    return result;
-  } catch {
-    return [];
   }
 }
 

@@ -30,7 +30,7 @@ export const defaultTodoConfig: TodoConfig = {
 
 const PRODUCTION_EXTS = [".ts", ".tsx", ".js", ".jsx", ".py", ".go", ".rs", ".java", ".rb", ".sh"];
 
-export function checkTodo(files: StagedFile[], repoRoot: string, config: TodoConfig): CheckResult {
+export function checkTodo(files: StagedFile[], config: TodoConfig): CheckResult {
   const findings: Finding[] = [];
 
   for (const file of files) {

@@ -9,7 +9,7 @@ function makeFile(path: string, content: string): StagedFile {
 describe("checkTodo", () => {
   it("passes when no TODOs", () => {
     const files = [makeFile("src/index.ts", "const x = 1;")];
-    const result = checkTodo(files, "/tmp", defaultTodoConfig);
+    const result = checkTodo(files, defaultTodoConfig);
     expect(result.findings).toHaveLength(0);
   });
 
@@ -17,7 +17,7 @@ describe("checkTodo", () => {
     const files = [
       makeFile("src/api.ts", "// TODO: refactor this\nconst x = 1;"),
     ];
-    const result = checkTodo(files, "/tmp", defaultTodoConfig);
+    const result = checkTodo(files, defaultTodoConfig);
     expect(result.findings).toHaveLength(1);
     expect(result.findings[0].message).toMatch(/TODO/);
   });
@@ -26,7 +26,7 @@ describe("checkTodo", () => {
     const files = [
       makeFile("src/api.ts", "// TODO(#42): refactor this\nconst x = 1;"),
     ];
-    const result = checkTodo(files, "/tmp", defaultTodoConfig);
+    const result = checkTodo(files, defaultTodoConfig);
     expect(result.findings).toHaveLength(0);
   });
 
@@ -34,7 +34,7 @@ describe("checkTodo", () => {
     const files = [
       makeFile("src/api.ts", "// TODO https://github.com/foo/bar/issues/1\nconst x = 1;"),
     ];
-    const result = checkTodo(files, "/tmp", defaultTodoConfig);
+    const result = checkTodo(files, defaultTodoConfig);
     expect(result.findings).toHaveLength(0);
   });
 
@@ -43,7 +43,7 @@ describe("checkTodo", () => {
       makeFile("src/a.ts", "// FIXME: handle null\n"),
       makeFile("src/b.ts", "// XXX: hack\n"),
     ];
-    const result = checkTodo(files, "/tmp", defaultTodoConfig);
+    const result = checkTodo(files, defaultTodoConfig);
     expect(result.findings).toHaveLength(2);
   });
 
@@ -51,7 +51,7 @@ describe("checkTodo", () => {
     const files = [
       makeFile("src/a.ts", "// TODO: refactor\n"),
     ];
-    const result = checkTodo(files, "/tmp", { ...defaultTodoConfig, strict: true });
+    const result = checkTodo(files, { ...defaultTodoConfig, strict: true });
     expect(result.passed).toBe(false);
   });
 });

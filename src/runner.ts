@@ -15,7 +15,7 @@ import {
 } from "./checks/large-files.js";
 import { checkConsole, defaultConsoleConfig } from "./checks/console.js";
 import { checkTodo, defaultTodoConfig } from "./checks/todo.js";
-import { checkFilesize, defaultFilesizeConfig } from "./checks/filesize.js";
+import { checkSensitiveFiles, defaultSensitiveFilesConfig } from "./checks/sensitive-files.js";
 
 export interface Finding {
   file: string;
@@ -40,7 +40,7 @@ export interface RunConfig {
     "large-files": typeof defaultLargeFilesConfig;
     console: typeof defaultConsoleConfig;
     todo: typeof defaultTodoConfig;
-    filesize: typeof defaultFilesizeConfig;
+    "sensitive-files": typeof defaultSensitiveFilesConfig;
   };
 }
 
@@ -51,15 +51,35 @@ export const defaultRunConfig: RunConfig = {
     "large-files": defaultLargeFilesConfig,
     console: defaultConsoleConfig,
     todo: defaultTodoConfig,
-    filesize: defaultFilesizeConfig,
+    "sensitive-files": defaultSensitiveFilesConfig,
   },
 };
 
-export function runAllChecks(config: RunConfig): CheckResult[] {
-  const repoRoot = getRepoRoot();
+export interface RunOptions {
+  /** Override the git repo root. Defaults to `getRepoRoot()`. */
+  repoRoot?: string | null;
+}
+
+/**
+ * Run all enabled checks. When the caller is not in a git repo, the function
+ * returns a structured "git" check result rather than exiting the process —
+ * this keeps the contract uniform with `--json` callers.
+ */
+export function runAllChecks(config: RunConfig, opts: RunOptions = {}): CheckResult[] {
+  const repoRoot = opts.repoRoot !== undefined ? opts.repoRoot : getRepoRoot();
   if (!repoRoot) {
-    process.stderr.write(`${c.red("error:")} not in a git repository\n`);
-    process.exit(1);
+    return [{
+      name: "git",
+      passed: false,
+      findings: [{
+        file: "",
+        line: 0,
+        message: "not in a git repository",
+        evidence: "",
+        severity: "block",
+      }],
+      summary: "not in a git repository",
+    }];
   }
 
   const files = getStagedFiles(repoRoot);
@@ -72,8 +92,8 @@ export function runAllChecks(config: RunConfig): CheckResult[] {
   if (config.checks.secrets.enabled) results.push(checkSecrets(files, config.checks.secrets));
   if (config.checks["large-files"].enabled) results.push(checkLargeFiles(files, repoRoot, config.checks["large-files"]));
   if (config.checks.console.enabled) results.push(checkConsole(files, config.checks.console));
-  if (config.checks.todo.enabled) results.push(checkTodo(files, repoRoot, config.checks.todo));
-  if (config.checks.filesize.enabled) results.push(checkFilesize(files, config.checks.filesize));
+  if (config.checks.todo.enabled) results.push(checkTodo(files, config.checks.todo));
+  if (config.checks["sensitive-files"].enabled) results.push(checkSensitiveFiles(files, config.checks["sensitive-files"]));
   return results;
 }
 
@@ -84,7 +104,7 @@ export function runAllChecks(config: RunConfig): CheckResult[] {
 export interface RunReport {
   /** Wall-clock ISO timestamp at run start. */
   startedAt: string;
-  /** "0.1.0" — stapes-precommit version. */
+  /** "0.1.1" — stapes-precommit version. */
   tool: string;
   /** Exit code (0 pass, 1 fail, 2 warn-in-strict). */
   exitCode: number;
@@ -116,7 +136,7 @@ export function buildReport(results: CheckResult[], strict: boolean): RunReport 
   const findings = results.flatMap((r) => r.findings);
   return {
     startedAt: new Date().toISOString(),
-    tool: "stapes-precommit@0.1.0",
+    tool: "stapes-precommit@0.1.1",
     exitCode: exitCodeFromCounts(counts, strict),
     checkCount: results.length,
     failed: counts.failed,

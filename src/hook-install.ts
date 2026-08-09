@@ -11,6 +11,17 @@ import { c } from "./util.js";
 const HOOK_MARKER = "# >>> stapes-precommit >>>";
 const HOOK_MARKER_END = "# <<< stapes-precommit <<<";
 
+/**
+ * Write the hook script and ensure it's executable. `writeFileSync` with
+ * `{ mode: 0o755 }` only honours the mode on file creation — when the file
+ * already exists (re-install, append-into-existing), we have to chmod
+ * afterwards or git will fail to invoke a non-executable hook.
+ */
+function writeHook(path: string, content: string): void {
+  writeFileSync(path, content, { mode: 0o755 });
+  chmodSync(path, 0o755);
+}
+
 export function installHook(repoRoot: string): number {
   const hookPath = resolve(repoRoot, ".git/hooks/pre-commit");
   const gitHooksDir = resolve(repoRoot, ".git/hooks");
@@ -24,19 +35,21 @@ export function installHook(repoRoot: string): number {
   if (existsSync(hookPath)) {
     const existing = readFileSync(hookPath, "utf8");
     if (existing.includes(HOOK_MARKER)) {
-      process.stdout.write("stapes-precommit hook already installed. Reinstalling.\n");
-    } else {
-      // Existing hook is not ours. Append our marker block.
-      const appended = `${existing.trimEnd()}\n\n${hookContent()}\n`;
-      writeFileSync(hookPath, appended, { mode: 0o755 });
-      process.stdout.write(
-        `Existing hook preserved. stapes-precommit appended to ${hookPath}\n`
-      );
+      // Idempotent: re-write our block, leave the file executable.
+      writeHook(hookPath, existing);
+      process.stdout.write("stapes-precommit hook already installed. Reinstalled.\n");
       return 0;
     }
+    // Existing hook is not ours. Append our marker block, then chmod.
+    const appended = `${existing.trimEnd()}\n\n${hookContent()}\n`;
+    writeHook(hookPath, appended);
+    process.stdout.write(
+      `Existing hook preserved. stapes-precommit appended to ${hookPath}\n`
+    );
+    return 0;
   }
 
-  writeFileSync(hookPath, hookContent(), { mode: 0o755 });
+  writeHook(hookPath, hookContent());
   process.stdout.write(`Installed ${hookPath}\n`);
   return 0;
 }
@@ -59,12 +72,12 @@ export function uninstallHook(repoRoot: string): number {
   // Strip our block.
   const stripped = stripBlock(existing, HOOK_MARKER, HOOK_MARKER_END);
   if (stripped.trim().length === 0) {
-    // Hook is now empty — remove the file.
-    // Actually, let's just leave an empty exit-0 shim so git doesn't choke.
-    writeFileSync(hookPath, "#!/bin/sh\nexit 0\n", { mode: 0o755 });
+    // Hook is now empty — leave a no-op shim so git doesn't choke, and keep
+    // it executable.
+    writeHook(hookPath, "#!/bin/sh\nexit 0\n");
     process.stdout.write("stapes-precommit block removed. Hook replaced with no-op.\n");
   } else {
-    writeFileSync(hookPath, stripped, { mode: 0o755 });
+    writeHook(hookPath, stripped);
     process.stdout.write("stapes-precommit block removed.\n");
   }
   return 0;
@@ -88,15 +101,4 @@ function stripBlock(content: string, start: string, end: string): string {
   const before = content.slice(0, startIdx);
   const after = content.slice(endIdx + end.length);
   return before + after;
-}
-
-// Ensure the script can be imported and the chmod is set on install.
-import { statSync } from "node:fs";
-function _ensureExecutable(_path: string) {
-  try {
-    const st = statSync(_path);
-    chmodSync(_path, st.mode | 0o111);
-  } catch {
-    /* ignore */
-  }
 }

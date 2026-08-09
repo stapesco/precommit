@@ -54,6 +54,25 @@ describe("checkConsole", () => {
     expect(result.passed).toBe(true);
   });
 
+  it("skips nested scripts/ directory", () => {
+    const files = [
+      makeFile("packages/foo/scripts/build.ts", 'console.log("building");'),
+    ];
+    const result = checkConsole(files, defaultConsoleConfig);
+    expect(result.passed).toBe(true);
+  });
+
+  it("does NOT skip files with 'scripts' as a substring (false-negative fix)", () => {
+    // my-scripts/, scripts-utils/, etc. are NOT scripts/ dirs.
+    const files = [
+      makeFile("src/my-scripts/logger.ts", 'console.log("debug");'),
+      makeFile("src/scripts-utils/helper.ts", 'console.log("debug");'),
+    ];
+    const result = checkConsole(files, defaultConsoleConfig);
+    expect(result.passed).toBe(false);
+    expect(result.findings.length).toBe(2);
+  });
+
   it("skips non-JS files", () => {
     const files = [
       makeFile("README.md", 'console.log("hello");'),

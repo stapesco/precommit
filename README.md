@@ -37,11 +37,11 @@ add them.
 The next time anyone runs `git commit`:
 
 ```text
-✓ secrets      0 hits
-✓ large-files  0 hits
-✗ console      1 hit(s)
-⚠ todo         1 hit(s)
-✓ filesize     0 hits
+✓ secrets         0 hits
+✓ large-files     0 hits
+✗ console         1 hit(s)
+⚠ todo            1 hit(s)
+✓ sensitive-files 0 hits
 
 console:
   src/api/handler.ts:42
@@ -90,7 +90,7 @@ The five checks:
 | `large-files` | files above the size cap | warn > 1 MB, **block** > 10 MB | `--init-config` to override |
 | `console` | `console.log` / `console.warn` in `.ts` / `.js` / `.tsx` / `.jsx` | **block** (skipped in `*.test.*` and `__tests__/`) | — |
 | `todo` | `TODO` / `FIXME` / `XXX` without a ticket reference (`#1234`) | warn (block with `--strict`) | — |
-| `filesize` | sensitive filenames: `.env`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `service-account*.json`, `.npmrc`, `.netrc`, `*.sqlite` | **block** | filename-based |
+| `sensitive-files` | sensitive filenames: `.env`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `service-account*.json`, `.npmrc`, `.netrc`, `*.sqlite` | **block** | filename-based |
 
 Flags:
 
@@ -98,7 +98,7 @@ Flags:
   --init               install the pre-commit hook in current repo
   --uninstall          remove the pre-commit hook
   --run                run all checks against staged changes (default)
-  --check <name>       run a single check (secrets|large-files|console|todo|filesize)
+  --check <name>       run a single check (secrets|large-files|console|todo|sensitive-files)
   --list               list available checks
   --strict             treat warnings as errors
   --json               emit structured JSON on stdout (stable schema)
