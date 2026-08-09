@@ -101,7 +101,7 @@ Default (human):
 |---|---|
 | 0 | clean, or warn-only in non-strict mode |
 | 1 | at least one finding with `severity: "block"`, or warn in `--strict` mode |
-| 2 | Node.js too old, not in a git repository, or `--init` failure |
+| 2 | Node.js too old (`engines: >=18` not met — see `src/node-check.ts`) |
 
 `--version` and `--help` always exit 0 and write only to stdout. Stderr
 is empty in those modes too.
