@@ -18,6 +18,7 @@ import { resolve } from "node:path";
 import { defaultRunConfig, runAllChecks, reportAndExit, buildReport, emitJson } from "./runner.js";
 import { installHook, uninstallHook } from "./hook-install.js";
 import { getRepoRoot } from "./util.js";
+import { assertNodeVersion } from "./node-check.js";
 
 const VERSION = "0.1.0";
 
@@ -43,6 +44,7 @@ program.parse(process.argv);
 const opts = program.opts();
 
 async function main(): Promise<number> {
+  assertNodeVersion();
   // --init
   if (opts.init) {
     const repoRoot = getRepoRoot();

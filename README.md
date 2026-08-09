@@ -125,6 +125,38 @@ This tool is designed for AI agent runtimes and CI scripts:
   removes cleanly.
 - **Runs offline.** No API keys. No service to log into.
 
+### Verify it yourself (5 lines)
+
+The Agent-native section makes claims. Here's how to check each one in
+under 30 seconds:
+
+```bash
+# 1. Zero network calls during a run
+npx stapes-precommit --json >/dev/null && \
+  lsof -p $$ -i 2>/dev/null | grep -E "node|npx" || \
+  echo "no outgoing TCP from this shell"
+
+# 2. No files written outside .git/hooks/
+npx stapes-precommit --init && \
+  find . -newer package.json -not -path "./.git/*" -not -path "./node_modules/*"
+
+# 3. Stable exit code under --strict
+npx stapes-precommit --strict --json | jq '.exitCode'
+```
+
+### Worked example — agent-style pre-commit block
+
+```bash
+#!/usr/bin/env bash
+# .github/actions/pre-commit/style-check/action.yml step
+npx stapes-precommit --json > precommit-report.json
+code=$?
+if [ "$code" -ne 0 ]; then
+  jq -r '.findings[] | "::error file=\(.file)::\(.message)"' precommit-report.json
+  exit 1
+fi
+```
+
 ### Telemetry
 
 None. Zero network calls. The only filesystem write is
