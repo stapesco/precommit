@@ -184,6 +184,13 @@ code. Fork it. PRs are not accepted.
 See [AGENTS.md](./AGENTS.md) for machine-readable install instructions and
 the stable `--json` schema.
 
+## Issues
+
+If `stapes-precommit` doesn't work for you, the most likely fix is in
+the five files under `src/checks/`. Read them, fork, patch.
+
+For security disclosures, see [SECURITY.md](./SECURITY.md).
+
 ## License
 
 MIT

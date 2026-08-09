@@ -51,3 +51,19 @@ The previous name was misleading. Anyone reading the source would
 notice the check never inspected filesize — only filenames — and
 rightly lose trust in the rest of the documentation. v0.1.0 has
 zero users so the breaking change is free.
+
+### Added
+
+- `SECURITY.md` with a private disclosure channel (email). No bug
+  bounty; no SLA. Documents the 5-business-day acknowledgement target
+  and 30-day fix target.
+- `console` check no longer flags `console.log(...)` patterns inside
+  string literals, template literals, or line comments. Catches
+  error-message builders, JSDoc examples, and tutorial snippets that
+  would otherwise produce false positives.
+- `console` check now detects `console?.log(...)` and `console?.warn(...)`
+  (optional chaining). Previously missed.
+- `todo` check now recognises `// TODO @user: ...` (GitHub-style
+  attribution) as a valid ticket reference. Previously flagged as
+  missing-ticket.
+- 10 new tests covering the four detection improvements above.
