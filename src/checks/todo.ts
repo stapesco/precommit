@@ -47,13 +47,20 @@ export function checkTodo(files: StagedFile[], config: TodoConfig): CheckResult 
       const marker = m[1];
       const rest = m[2];
 
-      // Skip if it has a ticket reference (#NNN, URL, or parenthetical).
+      // Skip if it has a ticket reference. Recognised forms:
+      //   #NNN              GitHub-style issue
+      //   (#NNN)            same, parenthesised
+      //   https://...       a URL (issue, doc, slack thread)
+      //   (PROJ-123)        Jira-style key
+      //   [PROJ-123]        bracketed Jira
+      //   @user             GitHub-style attribution (treat as assigned)
       const hasTicket =
         /^\s*#\d+/.test(rest) ||
         /^\s*\(#?\d+\)/.test(rest) ||
         /^\s*https?:\/\//.test(rest) ||
         /^\s*\([A-Z]+-\d+\)/.test(rest) ||
-        /^\s*\[[A-Z]+-\d+\]/.test(rest);
+        /^\s*\[[A-Z]+-\d+\]/.test(rest) ||
+        /^\s*@\w+/.test(rest);
       if (hasTicket) continue;
 
       findings.push({file: file.path,

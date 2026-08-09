@@ -73,6 +73,61 @@ describe("checkConsole", () => {
     expect(result.findings.length).toBe(2);
   });
 
+  describe("string-literal false positives", () => {
+    it("does NOT flag console.log inside a double-quoted string", () => {
+      const files = [makeFile("src/logger.ts", 'const msg = "console.log(\\"hi\\")";')];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(true);
+    });
+
+    it("does NOT flag console.log inside a single-quoted string", () => {
+      const files = [makeFile("src/logger.ts", "const msg = 'console.log(\\\"hi\\\")';")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(true);
+    });
+
+    it("does NOT flag console.log inside a template literal", () => {
+      const files = [makeFile("src/logger.ts", "const doc = `console.log('debug')`;")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(true);
+    });
+
+    it("does NOT flag console.log in a line comment", () => {
+      const files = [makeFile("src/logger.ts", "// console.log('debug');")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(true);
+    });
+
+    it("STILL flags a real call on the same line as a string", () => {
+      const files = [
+        makeFile("src/logger.ts", 'const msg = "log"; console.log(msg);'),
+      ];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(false);
+      expect(result.findings.length).toBe(1);
+    });
+  });
+
+  describe("expanded detection", () => {
+    it("detects console.log with optional chaining (console?.log)", () => {
+      const files = [makeFile("src/logger.ts", "console?.log('debug');")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(false);
+    });
+
+    it("detects console.warn with optional chaining", () => {
+      const files = [makeFile("src/logger.ts", "console?.warn('warn');")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(false);
+    });
+
+    it("does NOT flag 'myconsole.log' (subword, not real console)", () => {
+      const files = [makeFile("src/util.ts", "myconsole.log('x');")];
+      const result = checkConsole(files, defaultConsoleConfig);
+      expect(result.passed).toBe(true);
+    });
+  });
+
   it("skips non-JS files", () => {
     const files = [
       makeFile("README.md", 'console.log("hello");'),
