@@ -36,7 +36,10 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
-      - run: npm install -g npm@latest
+      # Node 24 already ships npm 11.19.1, which is above the npm 11.5.1 floor
+      # for trusted publishing. Pin the major so a future npm 12 (which needs
+      # Node >= 24.15.0) cannot silently change the publish path.
+      - run: npm install -g npm@11
       - run: npm run build
       - run: npm test
       # Auth: npm trusted publishing (OIDC) is the primary path — the job holds
