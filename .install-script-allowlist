@@ -1,0 +1,15 @@
+# Install-script allowlist
+#
+# One entry per dependency that is permitted to run an install lifecycle
+# script. A dependency that runs no install script still needs an entry when
+# it is newly added, so the decision is recorded rather than assumed.
+#
+# Format: <package-name>  # reason
+#
+# Verified 2026-11-08 against the installed package manifests: each package
+# below declares no install, postinstall, prepare, or prepublish script.
+
+commander  # CLI argument parser; pure JS, no build step, no install script
+vitest  # test runner; ships prebuilt binaries per platform, no install script
+typescript  # compiler; ships prebuilt binaries per platform, no install script
+@types/node  # type declarations only; no runtime code, no install script

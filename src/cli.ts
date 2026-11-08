@@ -17,10 +17,13 @@ import { writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { defaultRunConfig, runAllChecks, reportAndExit, buildReport, emitJson } from "./runner.js";
 import { installHook, uninstallHook } from "./hook-install.js";
-import { c, getRepoRoot } from "./util.js";
+import { c, getRepoRoot, VERSION } from "./util.js";
 import { assertNodeVersion } from "./node-check.js";
-
-const VERSION = "0.1.1";
+import { defaultSecretsConfig } from "./checks/secrets.js";
+import { defaultLargeFilesConfig } from "./checks/large-files.js";
+import { defaultConsoleConfig } from "./checks/console.js";
+import { defaultTodoConfig } from "./checks/todo.js";
+import { defaultSensitiveFilesConfig } from "./checks/sensitive-files.js";
 
 const program = new Command();
 
@@ -51,13 +54,15 @@ async function main(): Promise<number> {
   // --init-config
   if (opts.initConfig) {
     const path = resolve(opts.initConfig);
+    // Build the starter config from each check's own defaults, so the written
+    // file can never drift from the thresholds the checks actually enforce.
     const config = {
       checks: {
-        secrets: { enabled: true, extra_patterns: [] },
-        "large-files": { enabled: true, max_kb: 10240, warn_kb: 1024 },
-        console: { enabled: true, allow_in_tests: true },
-        todo: { enabled: true, strict: false },
-        "sensitive-files": { enabled: true },
+        secrets: defaultSecretsConfig,
+        "large-files": defaultLargeFilesConfig,
+        console: defaultConsoleConfig,
+        todo: defaultTodoConfig,
+        "sensitive-files": defaultSensitiveFilesConfig,
       },
     };
     writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf8");

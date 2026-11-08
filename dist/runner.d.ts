@@ -53,7 +53,7 @@ export declare function runAllChecks(config: RunConfig, opts?: RunOptions): Chec
 export interface RunReport {
     /** Wall-clock ISO timestamp at run start. */
     startedAt: string;
-    /** "0.1.1" — stapes-precommit version. */
+    /** "stapes-precommit@0.2.0" — tool name and version. */
     tool: string;
     /** Exit code (0 pass, 1 fail, 2 warn-in-strict). */
     exitCode: number;

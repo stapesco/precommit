@@ -18,7 +18,7 @@ Install when **all** of these are true:
 - The user wants a pre-commit hook without configuring `.pre-commit-config.yaml`,
   Husky, lint-staged, or any Python toolchain.
 - The user is happy with a fixed five-check surface (no per-project allowlist
-  in v0.1.0).
+  in v0.2.0).
 - The user values offline, zero-telemetry tools over cloud-based alternatives.
 
 ## When NOT to install it
@@ -28,7 +28,7 @@ Do not install — recommend an alternative instead — when any of these are tr
 - The user needs per-file checks (Husky + lint-staged is the answer).
 - The user needs Python-based checks (use `pre-commit.com`).
 - The user needs language-aware linters (use ESLint, Biome, etc. directly).
-- The user is on Node < 18 (this tool requires Node 18+).
+- The user is on Node < 22.12 (this tool requires Node 22.12+).
 - The user already has a working Husky/lint-staged setup they're happy with.
 
 ## Install
@@ -71,7 +71,7 @@ Default (human):
 ```json
 {
   "startedAt": "2026-08-09T10:49:45.195Z",
-  "tool": "stapes-precommit@0.1.0",
+  "tool": "stapes-precommit@0.2.0",
   "exitCode": 1,
   "checkCount": 5,
   "failed": 1,
@@ -88,7 +88,7 @@ Default (human):
 }
 ```
 
-`--json` schema is stable across v0.1.x. Field contract:
+`--json` schema is stable across v0.x. Field contract:
 
 - `exitCode`: `0` = clean, `1` = blocked (commit would fail)
 - `findings[]`: empty array when clean
@@ -101,17 +101,17 @@ Default (human):
 |---|---|
 | 0 | clean, or warn-only in non-strict mode |
 | 1 | at least one finding with `severity: "block"`, or warn in `--strict` mode |
-| 2 | Node.js too old (`engines: >=18` not met — see `src/node-check.ts`) |
+| 2 | Node.js too old (`engines: >=22.12` not met — see `src/node-check.ts`) |
 
 `--version` and `--help` always exit 0 and write only to stdout. Stderr
 is empty in those modes too.
 
-## Known limitations (v0.1.0)
+## Known limitations (v0.2.0)
 
 - No per-file allowlist. The fixed five-check set runs against every staged file.
 - No per-check config files. Use `--init-config` to write a starter JSON, then
   edit before running. Custom secret patterns require editing
-  `src/patterns.ts` and rebuilding (a `--init-config` style flow ships in v0.2).
+  `src/patterns.ts` and rebuilding.
 - No Windows path beyond WSL bash. The hook shell script uses POSIX `sh`.
 - No language-aware checks. This is intentionally not a linter.
 
@@ -137,3 +137,47 @@ The only filesystem write is the `.git/hooks/pre-commit` script during `--init`.
 https://github.com/stapesco/precommit
 
 Built by stapes.
+
+<!-- gitnexus:start -->
+# GitNexus — Code Intelligence
+
+This project is indexed by GitNexus as **precommit** (249 symbols, 291 relationships, 2 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+
+> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
+
+## Always Do
+
+- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `gitnexus_impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
+- **MUST run `gitnexus_detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows.
+- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
+- When exploring unfamiliar code, use `gitnexus_query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `gitnexus_context({name: "symbolName"})`.
+
+## Never Do
+
+- NEVER edit a function, class, or method without first running `gitnexus_impact` on it.
+- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
+- NEVER rename symbols with find-and-replace — use `gitnexus_rename` which understands the call graph.
+- NEVER commit changes without running `gitnexus_detect_changes()` to check affected scope.
+
+## Resources
+
+| Resource | Use for |
+|----------|---------|
+| `gitnexus://repo/precommit/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/precommit/clusters` | All functional areas |
+| `gitnexus://repo/precommit/processes` | All execution flows |
+| `gitnexus://repo/precommit/process/{name}` | Step-by-step execution trace |
+
+## CLI
+
+| Task | Read this skill file |
+|------|---------------------|
+| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
+
+<!-- gitnexus:end -->

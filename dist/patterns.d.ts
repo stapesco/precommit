@@ -8,7 +8,7 @@
  * - trufflehog (https://github.com/trufflesecurity/trufflehog)
  * - GitHub secret-scanning partner patterns
  *
- * False positives are accepted in v0.1.0 — better to flag than miss.
+ * False positives are accepted in v0.2.0 — better to flag than miss.
  */
 export interface SecretPattern {
     name: string;

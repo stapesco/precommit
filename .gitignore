@@ -20,3 +20,12 @@ pnpm-debug.log*
 
 # Coverage artifacts
 .nyc_output
+
+# Deepsec local workspace (has its own package.json + pnpm workspace)
+.deepsec/
+
+# Local tooling artifacts
+.claude/
+.craft/
+graphify-out/
+CLAUDE.md

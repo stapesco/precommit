@@ -1,58 +1,97 @@
 {
-  "schema_version": "1.0",
-  "project": "stapes-precommit",
-  "stack": {
-    "runtime": {
-      "language": "typescript",
-      "runtime": "node",
-      "version": ">=18.0.0",
-      "target": "ES2022"
+  "deps": {
+    "@types/node": {
+      "behind_majors": 0,
+      "behind_minors": 0,
+      "behind_patches": 0,
+      "checked_at": "2026-11-08T06:32:13.632602+00:00",
+      "eol": null,
+      "latest": "26.6.6",
+      "released": "",
+      "source": "npm",
+      "version": "26.6.6"
     },
-    "package_manager": "npm",
-    "build": {
-      "tool": "tsc",
-      "version": "5.3.0"
+    "commander": {
+      "behind_majors": 0,
+      "behind_minors": 0,
+      "behind_patches": 0,
+      "checked_at": "2026-11-08T06:32:13.635121+00:00",
+      "eol": null,
+      "latest": "15.1.0",
+      "released": "",
+      "source": "npm",
+      "version": "15.1.0"
     },
-    "cli": {
-      "library": "commander",
-      "version": "11.1.0"
+    "deno": {
+      "checked_at": "2026-11-08T06:32:13.645521+00:00",
+      "cycle": "2.9",
+      "eol": false,
+      "latest": "2.9.8",
+      "source": "https://endoflife.date/api/deno.json",
+      "version": "PROJECT_RUNTIME"
     },
-    "tests": {
-      "tool": "vitest",
-      "version": "1.0.0"
+    "go": {
+      "checked_at": "2026-11-08T06:32:13.644873+00:00",
+      "cycle": "1.27",
+      "eol": false,
+      "latest": "1.27.3",
+      "source": "https://endoflife.date/api/go.json",
+      "version": "PROJECT_RUNTIME"
+    },
+    "nodejs": {
+      "checked_at": "2026-11-08T06:32:13.643009+00:00",
+      "cycle": "26",
+      "eol": "2029-04-30",
+      "latest": "26.13.0",
+      "source": "https://endoflife.date/api/nodejs.json",
+      "version": "PROJECT_RUNTIME"
+    },
+    "python": {
+      "checked_at": "2026-11-08T06:32:13.641987+00:00",
+      "cycle": "3.15",
+      "eol": "2031-10-31",
+      "latest": "3.15.2",
+      "source": "https://endoflife.date/api/python.json",
+      "version": "PROJECT_RUNTIME"
+    },
+    "rust": {
+      "checked_at": "2026-11-08T06:32:13.644128+00:00",
+      "cycle": "1.99",
+      "eol": false,
+      "latest": "1.99.1",
+      "source": "https://endoflife.date/api/rust.json",
+      "version": "PROJECT_RUNTIME"
+    },
+    "typescript": {
+      "behind_majors": 0,
+      "behind_minors": 0,
+      "behind_patches": 0,
+      "checked_at": "2026-11-08T06:32:13.636806+00:00",
+      "eol": null,
+      "latest": "7.0.2",
+      "released": "",
+      "source": "npm",
+      "version": "7.0.2"
+    },
+    "vitest": {
+      "behind_majors": 0,
+      "behind_minors": 0,
+      "behind_patches": 0,
+      "checked_at": "2026-11-08T06:32:13.639022+00:00",
+      "eol": null,
+      "latest": "5.1.0",
+      "released": "",
+      "source": "npm",
+      "version": "5.1.0"
     }
   },
-  "dependencies": {
-    "runtime": [
-      {
-        "name": "commander",
-        "version": "^11.1.0",
-        "license": "MIT"
-      }
-    ],
-    "dev": [
-      {
-        "name": "typescript",
-        "version": "^5.3.0",
-        "license": "Apache-2.0"
-      },
-      {
-        "name": "vitest",
-        "version": "^1.0.0",
-        "license": "MIT"
-      },
-      {
-        "name": "@types/node",
-        "version": "^20.10.0",
-        "license": "MIT"
-      }
-    ]
-  },
-  "checked_at": "2026-08-09",
-  "generated_at": "2026-08-09T17:55:00Z",
+  "generated_at": "2026-11-08T06:32:13.631669+00:00",
+  "generated_by": "techwatch-manifest.py v0.1.0",
+  "project_root": "/Users/leonstapelberg/DevProjects/stapes-precommit",
   "sources": [
-    "https://docs.npmjs.com/cli/v10/configuring-npm/package-json",
-    "https://vitest.dev/guide/",
-    "https://github.com/tj/commander.js"
+    "endoflife.date",
+    "PyPI",
+    "npm",
+    "crates.io"
   ]
 }

@@ -8,6 +8,18 @@
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
+/**
+ * The tool version. Single source of truth: the CLI `--version` flag and the
+ * `tool` field of the `--json` report both read this constant, so they can
+ * never drift apart.
+ */
+export const VERSION = "0.2.0";
+
+/** Bytes per kilobyte. */
+const BYTES_PER_KB = 1024;
+/** Bytes per megabyte. */
+const BYTES_PER_MB = BYTES_PER_KB * 1024;
+
 // ANSI color codes. Disabled when --no-color or NO_COLOR env var is set.
 const useColor = (() => {
   if (process.env.NO_COLOR !== undefined) return false;
@@ -116,7 +128,7 @@ export function padRight(s: string, n: number): string {
  * Format bytes for human-readable display.
  */
 export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < BYTES_PER_KB) return `${bytes} B`;
+  if (bytes < BYTES_PER_MB) return `${(bytes / BYTES_PER_KB).toFixed(1)} KB`;
+  return `${(bytes / BYTES_PER_MB).toFixed(1)} MB`;
 }

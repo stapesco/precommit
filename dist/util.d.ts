@@ -4,6 +4,12 @@
  * - readFileContent: read raw file content from disk
  * - color helpers
  */
+/**
+ * The tool version. Single source of truth: the CLI `--version` flag and the
+ * `tool` field of the `--json` report both read this constant, so they can
+ * never drift apart.
+ */
+export declare const VERSION = "0.2.0";
 export declare const c: {
     red: (s: string) => string;
     green: (s: string) => string;

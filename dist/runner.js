@@ -6,12 +6,14 @@
  * strict mode). The runner classifies the result, prints a summary, prints
  * details for checks with findings, and returns the exit code.
  */
-import { c, getStagedFiles, getRepoRoot } from "./util.js";
+import { c, getStagedFiles, getRepoRoot, VERSION } from "./util.js";
 import { checkSecrets, defaultSecretsConfig } from "./checks/secrets.js";
 import { checkLargeFiles, defaultLargeFilesConfig, } from "./checks/large-files.js";
 import { checkConsole, defaultConsoleConfig } from "./checks/console.js";
 import { checkTodo, defaultTodoConfig } from "./checks/todo.js";
 import { checkSensitiveFiles, defaultSensitiveFilesConfig } from "./checks/sensitive-files.js";
+/** Width of the check-name column in the human-readable summary. */
+const CHECK_NAME_COLUMN_WIDTH = 14;
 export const defaultRunConfig = {
     strict: false,
     checks: {
@@ -83,7 +85,7 @@ export function buildReport(results, strict) {
     const findings = results.flatMap((r) => r.findings);
     return {
         startedAt: new Date().toISOString(),
-        tool: "stapes-precommit@0.1.1",
+        tool: `stapes-precommit@${VERSION}`,
         exitCode: exitCodeFromCounts(counts, strict),
         checkCount: results.length,
         failed: counts.failed,
@@ -134,7 +136,7 @@ function printSummary(results) {
     for (const r of results) {
         const kind = classifyResult(r);
         const symChar = kind === "fail" ? sym.fail : kind === "warn" ? sym.warn : sym.pass;
-        const line = `${symChar} ${r.name.padEnd(14)}${r.summary}`;
+        const line = `${symChar} ${r.name.padEnd(CHECK_NAME_COLUMN_WIDTH)}${r.summary}`;
         if (kind === "fail") {
             process.stderr.write(line + "\n");
         }

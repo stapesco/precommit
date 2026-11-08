@@ -60,7 +60,7 @@ npx stapes-precommit --json | jq '.exitCode, .findings[].message'
 ```json
 {
   "startedAt": "2026-08-09T10:49:45.195Z",
-  "tool": "stapes-precommit@0.1.1",
+  "tool": "stapes-precommit@0.2.0",
   "exitCode": 1,
   "checkCount": 5,
   "failed": 1,
@@ -120,7 +120,7 @@ This tool is designed for AI agent runtimes and CI scripts:
 - **`--json`** emits parseable output with a stable schema (`startedAt`,
   `tool`, `exitCode`, `checkCount`, `failed`, `warned`, `findings[]`).
 - **Exit codes are stable.** `0` clean, `1` blocked, `2` Node.js too old
-  (engines `>=18` not met — see `src/node-check.ts`). All other failure
+  (engines `>=22.12` not met — see `src/node-check.ts`). All other failure
   modes (not in a git repo, `--init` failure, unknown `--check` name,
   unhandled exception) exit `1`.
 - **Idempotent install.** `--init` is safe to re-run. `--uninstall`
